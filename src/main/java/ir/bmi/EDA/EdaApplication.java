@@ -12,6 +12,7 @@ import java.util.function.Function;
  * To understand the Spring cloud stream programming model, you should be familiar with the following core concepts:
  *
  * Destination Binders: Components responsible to provide integration with the external messaging systems.
+ * Binder is responsible for data type conversion
  *
  * Bindings: Bridge between the external messaging systems and application provided Producers and Consumers of messages (created by the Destination Binders).
  *
@@ -35,14 +36,20 @@ public class EdaApplication {
 	}
 	@Bean
 	/**
+	 * Message Handler with functional programming model
+	 *
 	 * Since Spring Cloud Stream v2.1, another alternative for defining stream handlers and sources is
 	 * to use build-in support for Spring Cloud Function where
 	 * they can be expressed as beans of type java.util.function.[Supplier/Function/Consumer].
 	 *
 	 * The functional programming model defaults to a simple convention when it comes to binding names
-	 * By default the 'input' and 'output' binding names will be upperCase-in-0 and upperCase-out-0
+	 * By default the 'input' and 'output' binding names will be uppercase-in-0 and uppercase-out-0
+	 *
+	 * So if for example you would want to map the input of this function to a remote destination (e.g., topic, queue etc)
+	 * called "my-topic" you would do so with the following property:
+	 * --spring.cloud.stream.bindings.uppercase-in-0.destination=my-topic
 	 */
-	public Function<String,String> upperCase(){
+	public Function<String,String> uppercase(){
 		return s->s.toUpperCase();
 	}
 }
