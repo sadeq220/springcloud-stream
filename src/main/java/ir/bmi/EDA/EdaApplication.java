@@ -1,5 +1,6 @@
 package ir.bmi.EDA;
 
+import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.stream.binder.kafka.support.ConsumerConfigCustomizer;
@@ -31,7 +32,11 @@ public class EdaApplication {
 	 */
 	public ConsumerConfigCustomizer kafkaConsumerConfigCustomizer(){
 	return ((consumerProperties, bindingName, destination) -> {
-
+		consumerProperties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,"org.apache.kafka.common.serialization.StringDeserializer");
+		consumerProperties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,"org.apache.kafka.common.serialization.StringDeserializer");
+		consumerProperties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG,"earliest");// read AUTO_OFFSET_RESET_DOC
+		consumerProperties.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG,3);// to make sure we don't ran out of memory
+		consumerProperties.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG,20_000);
 	});
 	}
 	@Bean
