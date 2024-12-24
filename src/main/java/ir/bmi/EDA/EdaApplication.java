@@ -53,8 +53,16 @@ public class EdaApplication {
 	 * So if for example you would want to map the input of this function to a remote destination (e.g., topic, queue etc)
 	 * called "my-topic" you would do so with the following property:
 	 * --spring.cloud.stream.bindings.uppercase-in-0.destination=my-topic
+	 *
+	 * To specify which functional bean to bind to the external destination(s) exposed by the bindings,
+	 * you must provide spring.cloud.function.definition property.
 	 */
 	public Function<String,String> uppercase(){
 		return s->s.toUpperCase();
+	}
+
+	@Bean
+	public Function<String,String> wrapInQuotes(){
+		return s -> String.format("\"%s\"",s);
 	}
 }
