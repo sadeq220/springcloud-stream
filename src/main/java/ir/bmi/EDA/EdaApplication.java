@@ -1,9 +1,11 @@
 package ir.bmi.EDA;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.producer.ProducerConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.stream.binder.kafka.support.ConsumerConfigCustomizer;
+import org.springframework.cloud.stream.binder.kafka.support.ProducerConfigCustomizer;
 import org.springframework.context.annotation.Bean;
 
 import java.util.function.Function;
@@ -38,6 +40,17 @@ public class EdaApplication {
 		consumerProperties.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG,3);// to make sure we don't ran out of memory
 		consumerProperties.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG,20_000);
 	});
+	}
+	@Bean
+	public ProducerConfigCustomizer kafkaProducerCustomizer(){
+		return (producerProperties, bindingName, destination) -> {
+			producerProperties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,"org.apache.kafka.common.serialization.StringSerializer");
+			// producerProperties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,"org.apache.kafka.common.serialization.StringSerializer");// spring cloud stream converts message body to byte[] already
+			producerProperties.put(ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG,120_000);
+			producerProperties.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG,true);
+			producerProperties.put(ProducerConfig.ACKS_CONFIG,"all");
+			producerProperties.put(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG,15_000);//kafka.timeout , default is 30s , wait time for a reply from the broker
+		};
 	}
 	@Bean
 	/**

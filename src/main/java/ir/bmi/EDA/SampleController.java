@@ -2,6 +2,9 @@ package ir.bmi.EDA;
 
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.support.KafkaHeaders;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,7 +19,10 @@ public class SampleController {
     }
     @PostMapping("/kafka/publish")
     public Mono<ResponseEntity<String>> publishToKafka(@RequestBody String body){
-        boolean explicitBinding = streamBridge.send("OutputExplicitBinding", body);
+        Message<String> message = MessageBuilder.withPayload(body)
+                .setHeader(KafkaHeaders.KEY, "testingKey")
+                .build();
+        boolean explicitBinding = streamBridge.send("OutputExplicitBinding", message);
         return Mono.defer(()->{
             if (explicitBinding)
                 return Mono.just(ResponseEntity.ok("published to Kafka!"));
