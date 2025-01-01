@@ -4,7 +4,9 @@ import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,9 +20,10 @@ public class SampleController {
         this.streamBridge = streamBridge;
     }
     @PostMapping("/kafka/publish")
-    public Mono<ResponseEntity<String>> publishToKafka(@RequestBody String body){
-        Message<String> message = MessageBuilder.withPayload(body)
+    public Mono<ResponseEntity<String>> publishToKafka(@RequestBody UserMessage userMessage){
+        Message<UserMessage> message = MessageBuilder.withPayload(userMessage)
                 .setHeader(KafkaHeaders.KEY, "testingKey")
+                .setHeader(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON_VALUE)
                 .build();
         boolean explicitBinding = streamBridge.send("OutputExplicitBinding", message);
         return Mono.defer(()->{

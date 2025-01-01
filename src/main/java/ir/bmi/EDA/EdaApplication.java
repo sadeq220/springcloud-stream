@@ -70,8 +70,8 @@ public class EdaApplication {
 	 * To specify which functional bean to bind to the external destination(s) exposed by the bindings,
 	 * you must provide spring.cloud.function.definition property.
 	 */
-	public Function<String,String> uppercase(){
-		return s->s.toUpperCase();
+	public Function<UserMessage,String> uppercase(){
+		return s->s.getName().toUpperCase();
 	}
 
 	@Bean

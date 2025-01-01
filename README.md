@@ -18,5 +18,17 @@ core concepts:
 - Message
     - base pattern from *Enterprise Integration Patterns*
 
+### Content Type negotiation
+In Spring Cloud Stream, message transformation is accomplished with an     
+`org.springframework.messaging.converter.MessageConverter`
+
+In order to select the appropriate MessageConverter, the framework needs `contentType`.    
+Spring Cloud Stream provides three mechanisms to define contentType (in order of precedence):    
+- Message Header
+  - use **org.springframework.messaging.MessageHeaders.CONTENT_TYPE** and **org.springframework.util.MimeTypeUtils**
+- Binding contentType
+  - use **--spring.cloud.stream.bindings.<bindingName>.content-type**
+- Default *application/json*
+
 ### References
 - [spring cloud stream doc](https://docs.spring.io/spring-cloud-stream/docs/current/reference/html/spring-cloud-stream.html#spring-cloud-stream-overview-introducing)
