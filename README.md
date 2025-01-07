@@ -30,5 +30,28 @@ Spring Cloud Stream provides three mechanisms to define contentType (in order of
   - use **--spring.cloud.stream.bindings.<bindingName>.content-type**
 - Default *application/json*
 
+### Schema evolution support
+A schema defines the structure of message data. It defines allowed data types, their format, and relationships.     
+A schema acts as a blueprint for data.    
+Schema is also referred to as a `data contract`.    
+
+The scenario involves two producers, one using an old schema and the other using an evolved schema,     
+with a consumer capable of processing messages from both schema versions.    
+
+> The spring-cloud-stream-schema module contains two types of message converters that can be used for Apache Avro serialization:     
+>  - converters using the class information of the serialized/deserialized objects, or a schema with a location known at startup;    
+>  - converters using a schema registry - they locate the schemas at runtime, as well as dynamically registering new schemas as domain objects evolve.
+
+A schema registry lets you store schema information in a textual format (**typically JSON**) and      
+makes that information accessible to various applications that need it to receive and send data in **binary format**.    
+There are 2 options for schema registry:    
+- Spring cloud Standalone Schema Registry Server 
+- Confluent Schema Registry
+
+
 ### References
 - [spring cloud stream doc](https://docs.spring.io/spring-cloud-stream/docs/current/reference/html/spring-cloud-stream.html#spring-cloud-stream-overview-introducing)
+- [confluent schema registry](https://docs.confluent.io/platform/current/schema-registry/index.html)
+- [spring cloud stream schema evolution official samples](https://github.com/spring-cloud/spring-cloud-stream-samples/tree/main/spring-cloud-stream-schema-registry-integration)
+- [spring cloud stream schema module doc](https://docs.spring.io/spring-cloud-stream/docs/Elmhurst.M1/reference/html/schema-evolution.html)
+- [spring cloud schema registry doc](https://docs.spring.io/spring-cloud-schema-registry/docs/current/reference/html/spring-cloud-schema-registry.html)
