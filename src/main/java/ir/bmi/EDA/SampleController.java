@@ -50,4 +50,18 @@ public class SampleController {
                 return Mono.just(ResponseEntity.badRequest().body("failed to Publish to Kafka!"));
         });
     }
+    @PostMapping("/v2/kafka/avro-publish")
+    public Mono<ResponseEntity<String>> publishEnrichedDataAvroFormatToKafka(@RequestBody NewUserMessage newUserMessage){
+        Message<NewUserMessage> message = MessageBuilder.withPayload(newUserMessage)
+                .setHeader(KafkaHeaders.KEY, "testingKey")
+                .setHeader(MessageHeaders.CONTENT_TYPE, "application/*+avro")
+                .build();
+        boolean avroOutputBinding = streamBridge.send("AvroOutputBinding", message);
+        return Mono.defer(()->{
+            if (avroOutputBinding)
+                return Mono.just(ResponseEntity.ok("published to Kafka!"));
+            else
+                return Mono.just(ResponseEntity.badRequest().body("failed to Publish to Kafka!"));
+        });
+    }
 }
