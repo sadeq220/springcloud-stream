@@ -85,6 +85,13 @@ public class EdaApplication {
 		return s -> String.format("\"%s\"",s);
 	}
 
+	/**
+	 * It’s important to understand the difference between a writer schema (the application that wrote the message) and a reader schema (the receiving application)
+	 * We call the schema used to write the data as the writer's schema, and the schema that the application expects the reader's schema.
+	 * It is an error if the two schemas do not match.
+	 * for example when both schemas are records then:
+	 * 	if the reader's record schema has a field with no default value, and writer's schema does not have a field with the same name, an error is signalled.
+	 */
 	@Bean
 	public Consumer<Message<UserMessage>> avroDeserializerConsumer(){
 		return userMessage -> {
