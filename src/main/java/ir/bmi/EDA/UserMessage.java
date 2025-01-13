@@ -28,4 +28,13 @@ public class UserMessage {
     public void setEmail(String email) {
         this.email = email;
     }
+
+    @Override
+    public String toString() {
+        return "UserMessage{" +
+                "name='" + name + '\'' +
+                ", id='" + id + '\'' +
+                ", email='" + email + '\'' +
+                '}';
+    }
 }

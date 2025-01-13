@@ -2,12 +2,17 @@ package ir.bmi.EDA;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.stream.binder.kafka.support.ConsumerConfigCustomizer;
 import org.springframework.cloud.stream.binder.kafka.support.ProducerConfigCustomizer;
 import org.springframework.context.annotation.Bean;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageHeaders;
 
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 @SpringBootApplication
@@ -22,6 +27,7 @@ import java.util.function.Function;
  * Message: The canonical data structure used by producers and consumers to communicate with Destination Binders (and thus other applications via external messaging systems).
  */
 public class EdaApplication {
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	public static void main(String[] args) {
 		SpringApplication.run(EdaApplication.class, args);
@@ -35,7 +41,7 @@ public class EdaApplication {
 	public ConsumerConfigCustomizer kafkaConsumerConfigCustomizer(){
 	return ((consumerProperties, bindingName, destination) -> {
 		consumerProperties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,"org.apache.kafka.common.serialization.StringDeserializer");
-		consumerProperties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,"org.apache.kafka.common.serialization.StringDeserializer");
+		// consumerProperties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,"org.apache.kafka.common.serialization.StringDeserializer");
 		consumerProperties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG,"earliest");// read AUTO_OFFSET_RESET_DOC
 		consumerProperties.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG,3);// to make sure we don't ran out of memory
 		consumerProperties.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG,20_000);
@@ -77,5 +83,12 @@ public class EdaApplication {
 	@Bean
 	public Function<String,String> wrapInQuotes(){
 		return s -> String.format("\"%s\"",s);
+	}
+
+	@Bean
+	public Consumer<Message<UserMessage>> avroDeserializerConsumer(){
+		return userMessage -> {
+			logger.info("avro deserialized object:"+userMessage.getPayload()+" with content type: "+userMessage.getHeaders().get(MessageHeaders.CONTENT_TYPE));
+		};
 	}
 }
