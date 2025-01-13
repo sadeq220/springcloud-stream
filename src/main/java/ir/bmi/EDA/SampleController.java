@@ -1,6 +1,7 @@
 package ir.bmi.EDA;
 
 import org.springframework.cloud.stream.function.StreamBridge;
+import org.springframework.cloud.stream.schema.registry.client.SchemaRegistryClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
@@ -15,9 +16,11 @@ import reactor.core.publisher.Mono;
 @RestController
 public class SampleController {
     private final StreamBridge streamBridge;
+    private final SchemaRegistryClient schemaRegistryClient;
 
-    public SampleController(StreamBridge streamBridge) {
+    public SampleController(StreamBridge streamBridge, SchemaRegistryClient schemaRegistryClient) {
         this.streamBridge = streamBridge;
+        this.schemaRegistryClient = schemaRegistryClient;
     }
     @PostMapping("/kafka/publish")
     public Mono<ResponseEntity<String>> publishToKafka(@RequestBody UserMessage userMessage){
@@ -28,6 +31,20 @@ public class SampleController {
         boolean explicitBinding = streamBridge.send("OutputExplicitBinding", message);
         return Mono.defer(()->{
             if (explicitBinding)
+                return Mono.just(ResponseEntity.ok("published to Kafka!"));
+            else
+                return Mono.just(ResponseEntity.badRequest().body("failed to Publish to Kafka!"));
+        });
+    }
+    @PostMapping("/kafka/avro-publish")
+    public Mono<ResponseEntity<String>> publishAvroFormatToKafka(@RequestBody UserMessage userMessage){
+        Message<UserMessage> message = MessageBuilder.withPayload(userMessage)
+                .setHeader(KafkaHeaders.KEY, "testingKey")
+                .setHeader(MessageHeaders.CONTENT_TYPE, "application/*+avro")
+                .build();
+        boolean avroOutputBinding = streamBridge.send("AvroOutputBinding", message);
+        return Mono.defer(()->{
+            if (avroOutputBinding)
                 return Mono.just(ResponseEntity.ok("published to Kafka!"));
             else
                 return Mono.just(ResponseEntity.badRequest().body("failed to Publish to Kafka!"));
